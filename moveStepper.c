@@ -10,7 +10,7 @@ static volatile int buttonPressed;
 void buttonPressedInt (void) { buttonPressed = 1; }
 void moveMotor(float degrees);
 
-#define DEBUG 1
+#define DEBUG 0
 void debugPrintf (char *format, ...);
 
 #define SWITCH_PIN 5
@@ -130,6 +130,8 @@ void moveMotor(float degrees){
 }
 
 void debugPrintf(char *format, ...){
+  if (!DEBUG) return; 
+
   va_list args;
   va_start (args, format);
 
