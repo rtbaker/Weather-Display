@@ -15,3 +15,6 @@ the next 3 hours and display it by rotating a clock face like circle with weathe
 		
 2. getForecast.pl
    A perl script that retrieves the weather forecast using the Met Office Datapoint api and spins the display face to the required position.
+
+3. forecastLocations.pl
+	 Utility to help search for MetOffice Datapoint location id of the weather forecast you want.
