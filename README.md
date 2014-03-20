@@ -18,3 +18,7 @@ the next 3 hours and display it by rotating a clock face like circle with weathe
 
 3. forecastLocations.pl
 	 Utility to help search for MetOffice Datapoint location id of the weather forecast you want.
+	
+	Requires:
+		Google::GeoCoder::Smart Perl module.
+		Geo::Distance Perl module.

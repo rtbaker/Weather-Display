@@ -26,7 +26,7 @@ chomp $apiKey;
 debug ("Using apiKey: " . $apiKey);
 
 # What are we doing ?
-my $opt_string = 'hp:';
+my $opt_string = 'hp:d:';
 my %opt;
 getopts( "$opt_string", \%opt ) or usage();
 usage() if $opt{h};
@@ -43,7 +43,7 @@ if (exists($opt{'p'})){
 	}
 	
 	if (!$resultnum) {
-		print "No results !\n";
+		print "Postcode not recognised !\n";
 	} else {
 		my $result = $results[0];
 		my $location = $result->{geometry}->{location};
@@ -54,11 +54,20 @@ if (exists($opt{'p'})){
 		my $geo = new Geo::Distance;
 		my $locations = $mOffice->allLocations();
 		
+		my $searchDistance = 5;
+		if (exists($opt{'d'})){
+			if ($opt{'d'} =~ /^\d+$/){
+				$searchDistance = $opt{'d'};
+			} else {
+				print "Distance must be an integer, using 5 mile radius instead\n";
+			}
+		}
+		
 		foreach my $location (@{$locations}){
 			my $distance = $geo->distance( 'mile', $longitude,$latitude => $location->{longitude},$location->{latitude} );
 			
 			# 5 mile radius for now
-			if ($distance <= 5){
+			if ($distance <= $searchDistance){
 				printf "%-50s Id: %-11s Position: %s, %s\n", $location->{name}, $location->{id}, $location->{longitude}, $location->{latitude};
 			}
 		}
@@ -91,7 +100,7 @@ Retrieve MetOffice Datapoint locations. If no option given, print out all locati
 usage: $0 [-h] [-p postcode]
 	-h        		: this (help) message
 	-p postcode   : Postcode to search near
-
+  -d distance   : Radius around search postcode to show results for (default 5 miles)
 EOF
 	
 	exit;
