@@ -80,7 +80,12 @@ sub doRequest {
 	my $response = $self->{ua}->get($fullUrl);
 	
 	if (!$response->is_success){
-		warn "Error retrieving URL: " . $response->status_line;
+		print "Error retrieving URL: " . $response->status_line . "\n";
+		
+		if ($response->code == 403){
+			print "Invalid API Key ??\n";
+		}
+		
 		return undef;
 	}
  
