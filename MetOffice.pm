@@ -12,10 +12,12 @@ my $debug = 1;
 use LWP::UserAgent;
 use XML::Simple qw(:strict);
 use Data::Dumper;
+use Text::CSV;
 
 my %setup = (
-	apiUrl => "http://datapoint.metoffice.gov.uk/public/data/",
-	apiKey => undef
+	apiUrl 			=> "http://datapoint.metoffice.gov.uk/public/data/",
+	apiKey			=> undef,
+	codesFile 	=> "weatherCodes.csv",
 );
 
 # Constructor
@@ -57,6 +59,50 @@ sub allLocations {
 	return $data->{'Location'};
 }
 
+#  Return the 5 day forecast in 3 hour steps
+sub threeHourForecast {
+	my $self = shift;
+	my $id = shift or die "No site id given";
+	
+	if ($id !~ /^\d+$/){ die "Site id must be an interger"; }
+	
+	my $req = "val/wxfcs/all/xml/" . $id . "?res=3hourly";
+	
+	my $data = $self->doRequest($req, 'Period');
+	
+#	print Dumper ($data->{'DV'}->[0]->{'Location'}->[0]);
+	return $data->{'DV'}->[0]->{'Location'}->[0]->{'Period'};
+}
+
+my %codes;
+
+sub weatherCodes {
+	my $self = shift;
+
+	if (scalar(keys %codes) == 0){
+		# Initialise
+		use Text::CSV;
+		my $csv = Text::CSV->new({ sep_char => ',' });
+
+		open(my $data, '<', $self->{codesFile}) or die "Could not open '" . $self->{codeFile} . "' $!\n";
+
+		while (my $line = <$data>) {
+		  chomp $line;
+
+		  if ($csv->parse($line)) {
+		      my @fields = $csv->fields();
+					$codes{$fields[0]} = $fields[1];
+		  } else {
+		      warn "Line could not be parsed: $line\n";
+		  }
+		}
+	}
+	
+	return %codes;
+}
+
+# -----------------------------------------------------------------------------------------------------
+
 # Get a request's data from the API, internal use.
 
 sub doRequest {
@@ -89,9 +135,11 @@ sub doRequest {
 		return undef;
 	}
  
+#	print Dumper($response->decoded_content);
+	
 	my $xml =  XMLin($response->decoded_content,
 		ForceArray => ($keyAttr),
-		KeyAttr => ($keyAttr));
+		KeyAttr => []);
 
 	return $xml;
 }

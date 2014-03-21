@@ -110,7 +110,7 @@ sub usage {
 	print STDERR << "EOF";
 Retrieve MetOffice Datapoint locations. If no option given, print out all locations.
 
-usage: $0 [-h] [-p postcode]
+usage: $0 [-h] [-p postcode] [ -k API key | -f API Key file ] [ -d search distance]
 	-h        		: this (help) message
 	-p postcode   : Postcode to search near
   -d distance   : Radius around search postcode to show results for (default 5 miles)
